@@ -49,5 +49,5 @@ Edge comes from disciplined research, robust modeling, and continuous refinement
 
 ## Contact
 
-LinkedIn: [(https://www.linkedin.com/in/azizbohra/)]  
+LinkedIn: https://www.linkedin.com/in/azizbohra/  
 Email: aziz1605@outlook.com 
