@@ -29,6 +29,32 @@ Same model, same 120 ground-truth questions:
 
 ---
 
+## Skeptic: an LLM auditor whose only job is to kill trading strategies
+
+```text
+$ skeptic audit examples/fade_leaky
+REJECT  [centered_window]  (strategy.py:9)
+The "typical move" baseline is computed with `rolling(params["span"], center=True, ...)`, a centered window
+that uses future bars to judge whether the current move is a "shock" — a clear look-ahead leak. [...]
+```
+
+It reads a strategy's code and research notes, runs deterministic checks (look-ahead, costs, random entries, deflated Sharpe), and returns REJECT or SURVIVES CHECKS with file:line evidence. It never says "profitable". Measured on 90 strategies with planted flaws and planted real edges:
+
+| | Verdict correct [95% CI] | Right reason | Leak line found | Real edges rejected |
+|---|---|---|---:|---:|
+| Fixed rules, no LLM | 94% [89, 99] | 49% | 0% | 0 / 30 |
+| Claude Sonnet 5 + the checks | **97%** [92, 100] | **88%** | **89%** | 3 / 30 |
+| Claude Sonnet 5 reading code, no checks | 71% [67, 77] | 52% | 91% | **25 / 30** |
+
+- **The honest headline:** on verdicts alone the LLM doesn't beat fixed rules (p = 0.73). Its value is *why* and *where*. And without the statistics it rejects almost every real edge, which is why the model never produces a number.
+- **Audited my own gold system:** I pre-registered tests for my XAUUSD intraday system, and they failed. Re-run on an independent price feed it lost **−0.118R per trade** at a $0.50 spread (my original run: −0.123R), and Skeptic's checks found no edge: the spread is the whole loss. The write-up also lists three gaps in my own research process that the auditor missed.
+- **Ships three ways:** a CLI, an MCP server, and a `/skeptic` command for Claude Code, which went 20/20 on bench cases fixed in advance.
+- **Checked its own claims:** reran its errors (7 of 9 come back right: borderline calls, not a blind spot), removed a hint I had added after seeing them, and had the README fact-checked before shipping.
+
+[Repo](https://github.com/azb27/skeptic) · [Bench report](https://github.com/azb27/skeptic/blob/main/docs/results/bench.md) · [Where it fails](https://github.com/azb27/skeptic/blob/main/docs/results/failure-analysis.md) · [Case study](https://github.com/azb27/skeptic/blob/main/docs/case-study-gold-sniper.md)
+
+---
+
 ## Quant Research Lab
 
 Risk and derivatives engines, unit-tested and CI-validated. [Repo](https://github.com/azb27/quant-research-lab)
@@ -40,20 +66,14 @@ Risk and derivatives engines, unit-tested and CI-validated. [Repo](https://githu
 
 ---
 
-## Next: Skeptic
-
-A research agent pointed at my own XAUUSD intraday mean-reversion pipeline. The pipeline looks strong on directional accuracy under walk-forward validation, which is exactly why I don't trust it yet. Skeptic's job is to find out whether it survives transaction costs, leakage checks and multiple-testing correction, and to say so plainly if it doesn't.
-
----
-
 ## Hiring for a specific role? Start here
 
 | Role | Where to look |
 |---|---|
 | Forward Deployed Engineer | Stockroom's [discovery memo](https://github.com/azb27/stockroom/blob/main/docs/engagement/discovery-memo.md), [runbook](https://github.com/azb27/stockroom/blob/main/docs/engagement/runbook.md) and [week-2 plan](https://github.com/azb27/stockroom/blob/main/docs/engagement/week-2-plan.md) |
-| AI / agent engineer | The [agent loop](https://github.com/azb27/stockroom/blob/main/src/stockroom/agent/loop.py), [design decisions](https://github.com/azb27/stockroom/tree/main/docs/adr) and [eval report](https://github.com/azb27/stockroom/blob/main/docs/results/eval.md) |
-| AI-native / agentic engineering | How I direct coding agents: the [spec](https://github.com/azb27/stockroom/blob/main/SPEC.md), [`CLAUDE.md`](https://github.com/azb27/stockroom/blob/main/CLAUDE.md) and [phase-by-phase build log](https://github.com/azb27/stockroom/blob/main/docs/build-log.md) |
-| Quant research / quant dev | [Quant Research Lab](https://github.com/azb27/quant-research-lab) and Stockroom's [forecast backtest](https://github.com/azb27/stockroom/blob/main/docs/results/forecast_backtest.md) |
+| AI / agent engineer | Stockroom's [agent loop](https://github.com/azb27/stockroom/blob/main/src/stockroom/agent/loop.py), [design decisions](https://github.com/azb27/stockroom/tree/main/docs/adr) and [eval report](https://github.com/azb27/stockroom/blob/main/docs/results/eval.md); Skeptic's [ablations](https://github.com/azb27/skeptic/blob/main/docs/results/bench.md) (what the code, the checks and the model each add) |
+| AI-native / agentic engineering | How I direct coding agents: the [spec](https://github.com/azb27/stockroom/blob/main/SPEC.md), [`CLAUDE.md`](https://github.com/azb27/stockroom/blob/main/CLAUDE.md) and [phase-by-phase build log](https://github.com/azb27/stockroom/blob/main/docs/build-log.md); Skeptic's [MCP server and Claude Code skill](https://github.com/azb27/skeptic/blob/main/docs/adr/0003-ship-as-folder-contract-plus-mcp-checks.md) |
+| Quant research / quant dev | Skeptic's [case study](https://github.com/azb27/skeptic/blob/main/docs/case-study-gold-sniper.md) and [checks](https://github.com/azb27/skeptic/blob/main/src/skeptic/checks.py) (truncation leak test, deflated Sharpe, PBO), [Quant Research Lab](https://github.com/azb27/quant-research-lab), and Stockroom's [forecast backtest](https://github.com/azb27/stockroom/blob/main/docs/results/forecast_backtest.md) |
 | Data science / ML | The [forecast backtest](https://github.com/azb27/stockroom/blob/main/docs/results/forecast_backtest.md) and the eval statistics |
 
 ---
@@ -63,6 +83,7 @@ A research agent pointed at my own XAUUSD intraday mean-reversion pipeline. The 
 - **Numbers come from generated reports,** never typed by hand.
 - **Every project says what it won't do,** and where it still fails.
 - **Evals before polish.** An eval table with no UI beats a UI with no numbers.
+- **Pre-register, then try to break it.** My own trading system failed its pre-registered tests, so the repo says so.
 - **Markets are noisy and so is ERP data.** The discipline is the same: hold out honestly, quantify uncertainty, name the failure cases.
 
 ---
