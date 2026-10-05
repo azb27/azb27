@@ -36,7 +36,7 @@ Gulf retailers order stock over WhatsApp in English, Arabic, Arabizi and Roman U
   - a rollout plan with measured gates (shadow, then assist, then narrow auto-confirm);
   - a runbook, a data-handling note and a week-2 plan.
 
-[Repo](https://github.com/azb27/orderdesk) · [Eval report](https://github.com/azb27/orderdesk/blob/main/docs/results/eval.md) · [Failure analysis](https://github.com/azb27/orderdesk/blob/main/docs/engagement/failure-analysis.md) · [Rollout plan](https://github.com/azb27/orderdesk/blob/main/docs/engagement/rollout-plan.md)
+[Live demo](https://orderdesk-64jp.onrender.com) · [Repo](https://github.com/azb27/orderdesk) · [Eval report](https://github.com/azb27/orderdesk/blob/main/docs/results/eval.md) · [Failure analysis](https://github.com/azb27/orderdesk/blob/main/docs/engagement/failure-analysis.md) · [Rollout plan](https://github.com/azb27/orderdesk/blob/main/docs/engagement/rollout-plan.md)
 
 ---
 
