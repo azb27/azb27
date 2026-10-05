@@ -2,9 +2,41 @@
 
 **I build systems that make decisions on messy numbers, and I measure when they're wrong.**
 
-AI agents on real business data · evals with confidence intervals · forecasting and quant research · Dubai, open to remote and relocation
+AI products on real business data, end to end · evals with confidence intervals · forecasting and quant research · Dubai, open to remote and relocation
 
 By day I'm a Data Scientist & AI Solutions Engineer at TCS, working on a distribution and logistics business in the UAE: messy operational data, real stakeholders, decisions with money attached. On GitHub I build public versions of that kind of work, end to end. Coding agents do a lot of the typing; specs, tests and evals decide whether the result is right.
+
+---
+
+## Orderdesk: WhatsApp orders in four languages, drafted for a person to confirm
+
+<a href="https://github.com/azb27/orderdesk"><img src="https://github.com/azb27/orderdesk/raw/main/docs/images/demo.gif" width="720" alt="Orderdesk demo: an Arabizi WhatsApp order becomes a draft, an out-of-stock line is swapped, the order is confirmed and posted to the ERP with a reply in Arabizi; then a photo of a handwritten list becomes a six-line draft"></a>
+
+Gulf retailers order stock over WhatsApp in English, Arabic, Arabizi and Roman Urdu, and sometimes send a photo of a handwritten list. Orderdesk drafts the sales order with evidence for every line, and an order-taker confirms it. On 300 test conversations (1,902 lines), scored line by line:
+
+| | Lines found exactly [95% CI] | Orders exactly right | $ / conversation |
+|---|---|---|---|
+| Fuzzy matching, no model | 56.4% [52.0, 60.8] | 20.7% | $0 |
+| Claude Haiku 4.5 pipeline | 88.9% [86.7, 90.9] | 57.0% | $0.012 |
+| Claude Sonnet 5 pipeline | **93.5%** [92.0, 94.8] | **72.7%** | $0.021 |
+
+- **A full product, not a notebook:**
+  - a React 19 + TypeScript console: hand-written CSS, keyboard-first, Arabic right to left;
+  - FastAPI on Postgres: a `SKIP LOCKED` job queue, and live updates over `LISTEN/NOTIFY`;
+  - a WhatsApp Cloud API webhook with signature checks;
+  - a mock ERP whose idempotency key survives fault injection;
+  - Playwright tests against the same Docker image that deploys.
+- **The model never produces an id, a price or a total.** It reads the message and chooses from candidates it was given; code does every number.
+- **An honest eval:**
+  - A hand-written set the generator never saw scores lower: 80.5% of lines found.
+  - The customer's order history matters more than the model: 56.2% of lines without it.
+  - The failure analysis traced every error to the step that lost it. Three code fixes followed, re-measured from the response cache.
+- **Run as an engagement:**
+  - discovery memo and process map;
+  - a rollout plan with measured gates (shadow, then assist, then narrow auto-confirm);
+  - a runbook, a data-handling note and a week-2 plan.
+
+[Repo](https://github.com/azb27/orderdesk) · [Eval report](https://github.com/azb27/orderdesk/blob/main/docs/results/eval.md) · [Failure analysis](https://github.com/azb27/orderdesk/blob/main/docs/engagement/failure-analysis.md) · [Rollout plan](https://github.com/azb27/orderdesk/blob/main/docs/engagement/rollout-plan.md)
 
 ---
 
@@ -70,7 +102,8 @@ Risk and derivatives engines, unit-tested and CI-validated. [Repo](https://githu
 
 | Role | Where to look |
 |---|---|
-| Forward Deployed Engineer | Stockroom's [discovery memo](https://github.com/azb27/stockroom/blob/main/docs/engagement/discovery-memo.md), [runbook](https://github.com/azb27/stockroom/blob/main/docs/engagement/runbook.md) and [week-2 plan](https://github.com/azb27/stockroom/blob/main/docs/engagement/week-2-plan.md) |
+| Forward Deployed Engineer | Orderdesk's [engagement pack](https://github.com/azb27/orderdesk/tree/main/docs/engagement) (process map, [rollout plan](https://github.com/azb27/orderdesk/blob/main/docs/engagement/rollout-plan.md), runbook, data-handling note) and Stockroom's [discovery memo](https://github.com/azb27/stockroom/blob/main/docs/engagement/discovery-memo.md) and [week-2 plan](https://github.com/azb27/stockroom/blob/main/docs/engagement/week-2-plan.md) |
+| Full-stack / product engineer | Orderdesk's [React console](https://github.com/azb27/orderdesk/tree/main/web/src), [Postgres job queue and live updates](https://github.com/azb27/orderdesk/blob/main/docs/adr/0002-postgres-is-the-only-state.md), [webhook contract](https://github.com/azb27/orderdesk/blob/main/docs/adr/0003-a-simulator-that-speaks-the-cloud-api.md) and [CI with end-to-end tests](https://github.com/azb27/orderdesk/blob/main/.github/workflows/ci.yml) |
 | AI / agent engineer | Stockroom's [agent loop](https://github.com/azb27/stockroom/blob/main/src/stockroom/agent/loop.py), [design decisions](https://github.com/azb27/stockroom/tree/main/docs/adr) and [eval report](https://github.com/azb27/stockroom/blob/main/docs/results/eval.md); Skeptic's [ablations](https://github.com/azb27/skeptic/blob/main/docs/results/bench.md) (what the code, the checks and the model each add) |
 | AI-native / agentic engineering | How I direct coding agents: the [spec](https://github.com/azb27/stockroom/blob/main/SPEC.md), [`CLAUDE.md`](https://github.com/azb27/stockroom/blob/main/CLAUDE.md) and [phase-by-phase build log](https://github.com/azb27/stockroom/blob/main/docs/build-log.md); Skeptic's [MCP server and Claude Code skill](https://github.com/azb27/skeptic/blob/main/docs/adr/0003-ship-as-folder-contract-plus-mcp-checks.md) |
 | Quant research / quant dev | Skeptic's [case study](https://github.com/azb27/skeptic/blob/main/docs/case-study-gold-sniper.md) and [checks](https://github.com/azb27/skeptic/blob/main/src/skeptic/checks.py) (truncation leak test, deflated Sharpe, PBO), [Quant Research Lab](https://github.com/azb27/quant-research-lab), and Stockroom's [forecast backtest](https://github.com/azb27/stockroom/blob/main/docs/results/forecast_backtest.md) |
@@ -96,7 +129,7 @@ Risk and derivatives engines, unit-tested and CI-validated. [Repo](https://githu
 - **Software Quality Engineer, Writer:** test harnesses for an enterprise generative-AI platform
 - **M.S. Applied Data Science, Carnegie Mellon** · B.S. Data Science, University of Pittsburgh
 
-**Stack:** Python, SQL, DuckDB, LightGBM · Anthropic API, MCP, Claude Code · FastAPI, Next.js, Docker, GitHub Actions · NumPy, SciPy, statistical testing and Monte Carlo
+**Stack:** Python, SQL, Postgres, DuckDB, LightGBM · Anthropic API, MCP, Claude Code · FastAPI, React, TypeScript, CSS, Next.js · Docker, GitHub Actions, Playwright · NumPy, SciPy, statistical testing and Monte Carlo
 
 ---
 
